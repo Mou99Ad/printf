@@ -1,54 +1,58 @@
 #include "main.h"
-#include <stdarg.h>
-#include <stdio.h>
-
 /**
- * _printf - Custom implementation of the printf function.
- * @format: The format string.
- * @...: Additional arguments.
+ * _printf - Custom printf function
+ * @format: The format string
+ * @...: The arguments to be printed
  *
- * Return: The number of characters printed.
+ * Return: The number of characters printed
 */
 
 int _printf(const char *format, ...)
 {
-	int printed_chars = 0;
 	va_list args;
+	int i = 0, count = 0;
+	params_t params = PARAMS_INIT;
+
 	va_start(args, format);
 
-	while (*format)
+	while (format && format[i])
 	{
-		if (*format == '%')
+		if (format[i] == '%')
 		{
-			format++; // Move past the '%'
-			if (*format == '\0')
-				break; // Exit if '%' is at the end
-				       // Handle the format specifier
-			switch (*format)
+			i++;
+			if (format[i] == '\0')
+				break;
+
+			get_modifier((char *)&format[i], &params);
+			get_flag((char *)&format[i], &params);
+			get_width((char *)&format[i], &params, args);
+
+			specifier_t specifiers[] = {
+				{"c", print_char},
+				{"s", print_string},
+				{"%", print_percent},
+				{NULL, NULL}
+			};
+
+			for (int j = 0; specifiers[j].specifier != NULL; j++)
 			{
-				case 'c':
-					// Handle character
+				if (*(specifiers[j].specifier) == format[i])
+				{
+					count += specifiers[j].f(args, &params);
 					break;
-				case 's':
-					// Handle string
-					break;
-				case '%':
-					// Handle '%'
-					break;
-				default:
-					// Handle invalid specifier
-					break;
+				}
 			}
+
+			i++;
 		}
 		else
 		{
-			// Print regular characters
-			putchar(*format);
-			printed_chars++;
+			_putchar(format[i]);
+			count++;
+			i++;
 		}
-		format++;
 	}
 
 	va_end(args);
-	return printed_chars;
+	return (count);
 }
