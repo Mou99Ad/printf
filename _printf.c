@@ -1,58 +1,71 @@
 #include "main.h"
-/**
- * _printf - Custom printf function
- * @format: The format string
- * @...: The arguments to be printed
- *
- * Return: The number of characters printed
-*/
 
+#define BUFF_SIZE 1024
+
+void print_buffer(char buffer[], int *buff_ind);
+
+/**
+ * _printf - Printf function
+ * @format: format.
+ * Return: Printed chars.
+ */
 int _printf(const char *format, ...)
 {
-	va_list args;
-	int i = 0, count = 0;
-	params_t params = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int i, printed = 0, printed_chars = 0;
+    int flags, width, precision, size, buff_ind = 0;
+    va_list list;
+    char buffer[BUFF_SIZE];
 
-	va_start(args, format);
+    if (format == NULL)
+        return (-1);
 
-	while (format && format[i])
-	{
-		if (format[i] == '%')
-		{
-			i++;
-			if (format[i] == '\0')
-				break;
+    va_start(list, format);
 
-			get_modifier((char *)&format[i], &params);
-			get_flag((char *)&format[i], &params);
-			get_width((char *)&format[i], &params, args);
+    for (i = 0; format[i] != '\0'; i++)
+    {
+        if (format[i] != '%')
+        {
+            buffer[buff_ind++] = format[i];
+            if (buff_ind == BUFF_SIZE)
+                print_buffer(buffer, &buff_ind);
+            printed_chars++;
+        }
+        else
+        {
+            print_buffer(buffer, &buff_ind);
+            flags = get_flags(format, &i);
+            width = get_width(format, &i, list);
+            precision = get_precision(format, &i, list);
+            size = get_size(format, &i);
+            ++i;
+            printed = handle_print(format, &i, list, buffer,
+                flags, width, precision, size);
+            if (printed == -1)
+            {
+                va_end(list);
+                return (-1);
+            }
+            printed_chars += printed;
+        }
+    }
 
-			specifier_t specifiers[] = {
-				{"c", print_char},
-				{"s", print_string},
-				{"%", print_percent},
-				{NULL, NULL}
-			};
+    print_buffer(buffer, &buff_ind);
 
-			for (int j = 0; specifiers[j].specifier != NULL; j++)
-			{
-				if (*(specifiers[j].specifier) == format[i])
-				{
-					count += specifiers[j].f(args, &params);
-					break;
-				}
-			}
+    va_end(list);
 
-			i++;
-		}
-		else
-		{
-			_putchar(format[i]);
-			count++;
-			i++;
-		}
-	}
+    return (printed_chars);
+}
 
-	va_end(args);
-	return (count);
+/**
+ * print_buffer - Prints the contents of the buffer if it exists
+ * @buffer: Array of chars
+ * @buff_ind: Index at which to add the next char, represents the length.
+ */
+void print_buffer(char buffer[], int *buff_ind)
+{
+    if (*buff_ind > 0)
+    {
+        write(1, buffer, *buff_ind);
+        *buff_ind = 0;
+    }
 }
