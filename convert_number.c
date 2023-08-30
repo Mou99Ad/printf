@@ -26,7 +26,7 @@ int print_hex(va_list ap, params_t *params)
 int print_HEx(va_list ap, params_t *params)
 {
 	unsigned int num = va_arg(ap, unsigned int);
-	char *str = convert(num, 16, CONVERT_UPPERCASE, params);
+	char *str = convert(num, 16, CONVERT_LOWERCASE, params);
 	int count = print_number(str, params);
 
 	return (count);

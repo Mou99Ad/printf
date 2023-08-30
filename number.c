@@ -9,7 +9,7 @@
  *
  * Return: Pointer to the converted number string
 */
-char *convert(long int num, int base, int flags, params_t *params)
+char *convert(long int num, int base, int flags)
 {
 	static char *representation = "0123456789ABCDEF";
 	static char buffer[64];

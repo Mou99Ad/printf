@@ -11,7 +11,7 @@ int _printf(const char *format, ...)
 {
 	va_list args;
 	int i = 0, count = 0;
-	params_t params = PARAMS_INIT;
+	params_t params = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 	va_start(args, format);
 
