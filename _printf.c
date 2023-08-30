@@ -1,66 +1,54 @@
 #include "main.h"
 #include <stdarg.h>
-#include <unistd.h>
+#include <stdio.h>
 
 /**
- * _printf - Custom printf function
- * @format: Format string with conversion specifiers
- * Return: Number of characters printed
+ * _printf - Custom implementation of the printf function.
+ * @format: The format string.
+ * @...: Additional arguments.
+ *
+ * Return: The number of characters printed.
 */
 
 int _printf(const char *format, ...)
 {
-	int count = 0;
+	int printed_chars = 0;
 	va_list args;
-	const char *ptr;
-
 	va_start(args, format);
 
-	for (ptr = format; *ptr != '\0'; ptr++)
+	while (*format)
 	{
-		if (*ptr == '%')
+		if (*format == '%')
 		{
-			ptr++; /* Move past '%' */
-			if (*ptr == '\0')
-				break; /* End of format string */
-			if (*ptr == 'c')
+			format++; // Move past the '%'
+			if (*format == '\0')
+				break; // Exit if '%' is at the end
+				       // Handle the format specifier
+			switch (*format)
 			{
-				char c = va_arg(args, int);
-				_putchar(c);
-				count++;
-			}
-			else if (*ptr == 's')
-			{
-				char *str = va_arg(args, char *);
-				if (str == NULL)
-					str = "(null)";
-				while (*str != '\0')
-				{
-					_putchar(*str);
-					str++;
-					count++;
-				}
-			}
-			else if (*ptr == '%')
-			{
-				_putchar('%');
-				count++;
-			}
-			else
-			{
-				_putchar('%');
-				_putchar(*ptr);
-				count += 2;
+				case 'c':
+					// Handle character
+					break;
+				case 's':
+					// Handle string
+					break;
+				case '%':
+					// Handle '%'
+					break;
+				default:
+					// Handle invalid specifier
+					break;
 			}
 		}
 		else
 		{
-			_putchar(*ptr);
-			count++;
+			// Print regular characters
+			putchar(*format);
+			printed_chars++;
 		}
+		format++;
 	}
 
 	va_end(args);
-
-	return (count);
+	return printed_chars;
 }
